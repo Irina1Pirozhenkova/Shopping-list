@@ -66,13 +66,16 @@
 
 ###### Диаграмма последовательности для создания списка
 На диаграмме показан полный цикл синхронизации создания нового списка: клиентский SyncManager формирует операцию CreateList с данными списка и через NetworkClient отправляет её на эндпо-инт /sync. API_Gateway перенаправляет запрос в SyncService, где выпол-няется INSERT в таблицу списков, а затем сразу же собираются все непри-менённые операции (патчи) из журнала. После этого сервер возвращает клиенту набор патчей, содержащих как только что созданный список, так и любые изменения, сделанные другими устройствами, — и SyncManager применяет их к локальной БД.<br>
+
 Ссылка на изображение https://github.com/Irina1Pirozhenkova/Shopping-list/blob/main/Sequence%20Diagram%20%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5%20%D1%81%D0%BF%D0%B8%D1%81%D0%BA%D0%B0.png
+
 ![image](https://github.com/user-attachments/assets/e737b795-9b63-43bc-a7b1-21d5680dc701)
 
 ###### Диаграмма последовательности для удаления списка
 В сценарии клиентский SyncManager формирует опе-рацию DeleteList, указывая идентификатор списка, и передаёт её через NetworkClient на эндпоинт /sync. Серверный SyncService получает запрос, выполняет в центральной базе команду DELETE FROM lists WHERE id=…, а затем сразу же извлекает все ещё не применённые операции (пат-чи) из журнала изменений. Ответом передаётся массив патчей, включаю-щий подтверждение удаления и любые другие актуальные обновления от соавторов или с других устройств. После получения ответа клиентский SyncManager применяет патчи к локальной базе, удаляя список и синхро-низируя состояние всех локальных данных.<br>
 
 Ссылка на изображение https://github.com/Irina1Pirozhenkova/Shopping-list/blob/main/Sequence%20Diagram%20%D1%83%D0%B4%D0%B0%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D1%81%D0%BF%D0%B8%D1%81%D0%BA%D0%B0.png
+
 ![image](https://github.com/user-attachments/assets/b51e0928-59ec-427e-ad36-1056fe998be5)
 
 ###### API – методы
@@ -150,16 +153,16 @@ ER-диаграмма на рисунке 12 включает сущности U
 ---
 ### 7 SQL – запросы для заданных таблиц
 1. **Общая стоимость книг для каждого автора (по убыванию)**  
-   ```sql
-   SELECT
-     a.AuthorName,
-     SUM(b.Price) AS TotalPrice
-   FROM Authors a
-   JOIN Books b
-     ON b.AuthorId = a.Id
-   GROUP BY a.AuthorName
-   ORDER BY TotalPrice DESC;
-      ```
+ ```sql
+SELECT
+  a.AuthorName,
+  SUM(b.Price) AS TotalPrice
+FROM Authors a
+JOIN Books b
+  ON b.AuthorId = a.Id
+GROUP BY a.AuthorName
+ORDER BY TotalPrice DESC;
+```
 2. **Авторы с общей стоимостью книг > 1500**
 ```sql
 SELECT
@@ -171,9 +174,9 @@ JOIN Books b
 GROUP BY a.AuthorName
 HAVING SUM(b.Price) > 1500
 ORDER BY TotalPrice DESC;
-   ```
+```
 3. **Авторы и количество их книг**  
-   ```sql
+```sql
 SELECT
   a.AuthorName,
   COUNT(*) AS BookCount
@@ -182,9 +185,9 @@ JOIN Books b
   ON b.AuthorId = a.Id
 GROUP BY a.AuthorName
 ORDER BY BookCount DESC;
-   ```
+ ```
 4. **Авторы без книг**  
-   ```sql
+```sql
 SELECT
   a.AuthorName
 FROM Authors a
@@ -193,4 +196,4 @@ WHERE NOT EXISTS (
   FROM Books b
   WHERE b.AuthorId = a.Id
 );
-   ```
+```
