@@ -102,13 +102,16 @@
 ###### ER диаграмма сущностей
 ER-диаграмма на рисунке 12 включает сущности User, ShoppingList, Item и Reminder: User связана с ShoppingList по «один-ко-многим» через user_id, ShoppingList объединяет множество Item по list_id и имеет един-ственное Reminder (отношение «один-к-одному»), а внешние ключи user_id и list_id гарантируют ссылочную целостность.
 Ссылка на изображение https://github.com/Irina1Pirozhenkova/Shopping-list/blob/main/ER%20%D0%B4%D0%B8%D0%B0%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B0%20%D1%81%D1%83%D1%89%D0%BD%D0%BE%D1%81%D1%82%D0%B5%D0%B9.png
+
 ![image](https://github.com/user-attachments/assets/715d41af-bd6e-4d02-9e77-904afff09310)
 
 ---
 ### 4 Прототип экрана мобильного приложения
 На макете экрана списка покупок в шапке слева распо-ложена кнопка «Назад», по центру — название списка («Продукты на ужин»), а справа — индикатор активного напоминания. Под заголовком — большая кнопка «Добавить товар», открывающая форму ввода нового пункта. Каждый элемент списка представлен чекбоксом для отметки «куп-лено», названием товара и иконкой «звезда» для приоритетных позиций или пустым квадратом, а справа — меню действий (удалить, пометить купленным, изменить приоритет). Внизу размещена упрощённая навига-ция с двумя вкладками: «Главная» (текущий список) и «Списки» (обзор всех списков).
 Ссылка на изображение https://github.com/Irina1Pirozhenkova/Shopping-list/blob/main/%D0%BF%D1%80%D0%BE%D1%82%D0%BE%D1%82%D0%B8%D0%BF%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0.jpg
+
 ![image](https://github.com/user-attachments/assets/b9a3ae50-de99-493c-a400-d8f0b190dc7f)
+
 Ссылка на проект https://www.figma.com/design/gcmdOdZ1OfoNi9Rdw7FXBT/Untitled?node-id=0-1&t=JuhITtGZmJDlOGjw-0
 
 ---
@@ -129,8 +132,8 @@ ER-диаграмма на рисунке 12 включает сущности U
 `PATCH /lists/{listId}/items/{itemId}/purchase`
 - **Request**  
   ```json
-  { "purchased": true | false }
-{ "id": "<itemId>", "purchased": true | false }
+  { "purchased": true|false }
+{ "id": "<itemId>", "purchased": true|false }
 
 ---
 ### 6 Сложности разработки и вопросы заказчику
@@ -143,3 +146,48 @@ ER-диаграмма на рисунке 12 включает сущности U
 2. Требуется ли шифрование данных на стороне клиента и сервера (например, для соответствия GDPR или корпоративным политикам без-опасности)?
 3. Каковы ограничения по задержке синхронизации и количеству од-новременно подключённых устройств для одного списка (SLA, допусти-мые тайм-ауты)?
 
+---
+### 7 SQL – запросы для заданных таблиц
+1. **Общая стоимость книг для каждого автора (по убыванию)**  
+   ```sql
+   SELECT
+     a.AuthorName,
+     SUM(b.Price) AS TotalPrice
+   FROM Authors a
+   JOIN Books b
+     ON b.AuthorId = a.Id
+   GROUP BY a.AuthorName
+   ORDER BY TotalPrice DESC;
+2. **Авторы с общей стоимостью книг > 1500**
+```sql
+SELECT
+  a.AuthorName,
+  SUM(b.Price) AS TotalPrice
+FROM Authors a
+JOIN Books b
+  ON b.AuthorId = a.Id
+GROUP BY a.AuthorName
+HAVING SUM(b.Price) > 1500
+ORDER BY TotalPrice DESC;
+
+3. **Авторы и количество их книг**  
+   ```sql
+SELECT
+  a.AuthorName,
+  COUNT(*) AS BookCount
+FROM Authors a
+JOIN Books b
+  ON b.AuthorId = a.Id
+GROUP BY a.AuthorName
+ORDER BY BookCount DESC;
+
+4. **Авторы без книг**  
+   ```sql
+SELECT
+  a.AuthorName
+FROM Authors a
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM Books b
+  WHERE b.AuthorId = a.Id
+);
