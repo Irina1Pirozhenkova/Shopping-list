@@ -71,6 +71,7 @@
 
 ###### Диаграмма последовательности для удаления списка
 В сценарии клиентский SyncManager формирует опе-рацию DeleteList, указывая идентификатор списка, и передаёт её через NetworkClient на эндпоинт /sync. Серверный SyncService получает запрос, выполняет в центральной базе команду DELETE FROM lists WHERE id=…, а затем сразу же извлекает все ещё не применённые операции (пат-чи) из журнала изменений. Ответом передаётся массив патчей, включаю-щий подтверждение удаления и любые другие актуальные обновления от соавторов или с других устройств. После получения ответа клиентский SyncManager применяет патчи к локальной базе, удаляя список и синхро-низируя состояние всех локальных данных.<br>
+
 Ссылка на изображение https://github.com/Irina1Pirozhenkova/Shopping-list/blob/main/Sequence%20Diagram%20%D1%83%D0%B4%D0%B0%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D1%81%D0%BF%D0%B8%D1%81%D0%BA%D0%B0.png
 ![image](https://github.com/user-attachments/assets/b51e0928-59ec-427e-ad36-1056fe998be5)
 
@@ -132,7 +133,7 @@ ER-диаграмма на рисунке 12 включает сущности U
 `PATCH /lists/{listId}/items/{itemId}/purchase`
 - **Request**  
   ```json
-{ "purchased": true|false }
+   { "purchased": true|false }
 { "id": "<itemId>", "purchased": true|false }
 
 ---
@@ -158,7 +159,7 @@ ER-диаграмма на рисунке 12 включает сущности U
      ON b.AuthorId = a.Id
    GROUP BY a.AuthorName
    ORDER BY TotalPrice DESC;
-      ```sql
+      ```
 2. **Авторы с общей стоимостью книг > 1500**
 ```sql
 SELECT
@@ -170,7 +171,7 @@ JOIN Books b
 GROUP BY a.AuthorName
 HAVING SUM(b.Price) > 1500
 ORDER BY TotalPrice DESC;
-   ```sql
+   ```
 3. **Авторы и количество их книг**  
    ```sql
 SELECT
@@ -181,7 +182,7 @@ JOIN Books b
   ON b.AuthorId = a.Id
 GROUP BY a.AuthorName
 ORDER BY BookCount DESC;
-   ```sql
+   ```
 4. **Авторы без книг**  
    ```sql
 SELECT
@@ -192,4 +193,4 @@ WHERE NOT EXISTS (
   FROM Books b
   WHERE b.AuthorId = a.Id
 );
-   ```sql
+   ```
